@@ -25,31 +25,40 @@
 ## Project Vision & Philosophy
 
 ### Mission Statement
-**Aesthetica Physica** is a view-only web gallery showcasing physics-driven 3D visualizations as high-end generative art. Visitors observe mesmerizing, autonomous animations—atoms pulsing with electron clouds, solar systems in graceful orbital dance, DNA helices twisting through space—all governed by real physics simulations. No interaction required; pure visual contemplation.
+**Aesthetica Physica** is a web gallery showcasing physics-driven 3D visualizations as high-end generative art. The platform features two distinct viewing modes: **Animated Mode** for mesmerizing, autonomous animations, and **Interactive Mode** for detailed exploration with educational labels—like traditional scientific diagrams brought to life in 3D.
 
 ### Core Principles
 
 1. **Physics-Driven Motion**: All movement is determined by accurate physics simulation (gravity, electromagnetism, molecular forces)
-2. **Cinematic Quality**: AAA game-level graphics, film-quality rendering
-3. **Autonomous Beauty**: Visualizations run continuously without user input—digital art installations
-4. **Performance Excellence**: 60fps on modern hardware, graceful degradation on older devices
-5. **Generative Aesthetics**: Procedural, shader-driven visuals that feel alive and ever-evolving
+2. **Cinematic Quality**: AAA game-level graphics, film-quality rendering at consistent 60fps
+3. **Dual-Mode Experience**: Seamless switching between contemplative animation and interactive exploration
+4. **Zero Lag Tolerance**: Buttery-smooth animations with no stuttering or frame drops
+5. **Modular Architecture**: Extensible system designed to easily add new visualizations
+6. **Educational Value**: Interactive mode provides labeled diagrams for learning
 
 ### Experience Philosophy
 
-This is a **view-only gallery**. There are no controls, no buttons, no user input. Visitors arrive at the website and are immediately immersed in beautiful, physics-accurate visualizations. The experience is:
+The platform offers **two complementary modes**:
+
+#### Mode 1: Animated (Default)
+- **Autonomous Motion**: Visualizations run continuously with physics-driven animation
 - **Contemplative**: Like watching a lava lamp or aquarium
-- **Mesmerizing**: Continuous, hypnotic motion
-- **Educational by Osmosis**: Physics principles revealed through observation
-- **Ambient**: Can run in the background as digital art
+- **Cinematic Camera**: Auto-orbiting camera showcases the visualization from optimal angles
+- **No Interaction**: Pure visual experience, no controls visible
+
+#### Mode 2: Interactive (Drag & View)
+- **User-Controlled Camera**: Drag to rotate, scroll to zoom, explore freely
+- **Educational Labels**: Each part of the diagram displays informative labels
+- **Static Structure**: Animation pauses to allow detailed examination
+- **Traditional Diagram Feel**: Like an interactive 3D textbook illustration
 
 ### Target Audience
 
+- Students learning physics, chemistry, and biology
+- Educators seeking engaging teaching tools
 - Digital art enthusiasts and collectors
 - Science lovers seeking ambient visualizations
-- Offices and spaces wanting dynamic digital art displays
 - Museums and exhibitions for installation pieces
-- Anyone who appreciates the beauty of physics in motion
 
 ---
 
@@ -101,9 +110,10 @@ Custom Physics Layer
 ```
 React 18+
 ├── Functional components with hooks
-├── Zustand (scene state management)
+├── Zustand (scene/mode state management)
 ├── React Three Fiber (declarative Three.js)
-└── No user controls (view-only experience)
+├── @react-three/drei (OrbitControls, Html labels)
+└── Mode switching (Animated ↔ Interactive)
 ```
 
 #### Build & Development
@@ -141,56 +151,120 @@ Vite 5+
 }
 ```
 
-> **Note**: No UI libraries (like Leva) are needed since this is a view-only experience with no user controls.
+> **Note**: Minimal UI - only a mode toggle button. Labels use @react-three/drei's Html component for 3D-positioned annotations.
 
 ---
 
 ## Architecture Overview
 
-### System Layers
+### Modular Plugin Architecture
+
+The system is designed for easy extension. Each visualization is a self-contained module that implements a common interface.
 
 ```
-┌─────────────────────────────────────────────────┐
-│         Scene Management (Zustand)              │
-│  Scene State | Physics Params | Animation Time  │
-└─────────────────────────────────────────────────┘
-                      ↕
-┌─────────────────────────────────────────────────┐
-│      Three.js Rendering Layer (3D Scene)        │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-│  │ Geometry │  │ Materials│  │ Lighting │      │
-│  │  System  │  │  Shaders │  │  System  │      │
-│  └──────────┘  └──────────┘  └──────────┘      │
-└─────────────────────────────────────────────────┘
-                      ↕
-┌─────────────────────────────────────────────────┐
-│         Physics Simulation Layer                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-│  │ Orbital  │  │ Particle │  │ Molecular│      │
-│  │ Mechanics│  │ Systems  │  │ Dynamics │      │
-│  └──────────┘  └──────────┘  └──────────┘      │
-└─────────────────────────────────────────────────┘
-                      ↕
-┌─────────────────────────────────────────────────┐
-│         GPU Compute Layer (Shaders)             │
-│  Particle Updates | Orbital Calculations        │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                    Visualization Registry                        │
+│  ┌─────────┐  ┌─────────────┐  ┌──────────┐  ┌─────────────┐   │
+│  │  Atom   │  │ SolarSystem │  │ DNAHelix │  │  [Future]   │   │
+│  └─────────┘  └─────────────┘  └──────────┘  └─────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│              Mode Controller (Animated ↔ Interactive)            │
+│  ┌───────────────────────┐    ┌───────────────────────────┐    │
+│  │    ANIMATED MODE      │    │    INTERACTIVE MODE       │    │
+│  │  • Auto-orbit camera  │    │  • OrbitControls (drag)   │    │
+│  │  • Physics running    │    │  • Physics paused         │    │
+│  │  • Labels hidden      │    │  • Labels visible         │    │
+│  └───────────────────────┘    └───────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                    Core Rendering Engine                         │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐   │
+│  │ Geometry │  │ Materials│  │ Lighting │  │ Label System │   │
+│  │  System  │  │  Shaders │  │  System  │  │  (Html/CSS)  │   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                    Physics Simulation Layer                      │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐                      │
+│  │ Orbital  │  │ Particle │  │ Molecular│                      │
+│  │ Mechanics│  │ Systems  │  │ Dynamics │                      │
+│  └──────────┘  └──────────┘  └──────────┘                      │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Data Flow (Autonomous Loop)
+### Visualization Interface
+
+Every visualization module must implement this interface:
+
+```typescript
+interface Visualization {
+  // Metadata
+  id: string;
+  name: string;
+  description: string;
+
+  // Component
+  Component: React.FC<VisualizationProps>;
+
+  // Labels for interactive mode
+  labels: Label[];
+
+  // Camera settings
+  cameraConfig: {
+    animated: { distance: number; speed: number; elevation: number };
+    interactive: { minDistance: number; maxDistance: number };
+  };
+
+  // Physics update function (called each frame in animated mode)
+  updatePhysics?: (delta: number, state: PhysicsState) => void;
+}
+
+interface Label {
+  id: string;
+  text: string;
+  description?: string;
+  position: [number, number, number];  // 3D position
+  attachTo?: string;  // ID of mesh to follow
+}
+```
+
+### Data Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         MODE: ANIMATED                           │
+│  RAF Loop → Physics Tick → Update Positions → Auto-Camera → Render
+│                                                    ↓              │
+│                                              60fps smooth         │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                       MODE: INTERACTIVE                          │
+│  User Drag → OrbitControls → Camera Update → Render + Labels     │
+│       ↓                                           ↓              │
+│  Scroll Zoom                              Labels track 3D pos    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Performance Architecture
+
+To ensure zero lag and smooth 60fps:
 
 ```javascript
-// No user input - fully autonomous animation loop
-Animation Frame → Physics Tick → Scene Update → Render → Next Frame
-                       ↓              ↓            ↓
-               Forces/Orbits      Positions     WebGL
+// Performance requirements
+const PERFORMANCE_TARGETS = {
+  targetFPS: 60,
+  maxFrameTime: 16.67,      // ms (1000/60)
+  physicsTimeStep: 1/60,    // Fixed timestep
+  maxParticles: 100000,     // GPU instanced
+  maxDrawCalls: 50,         // Batched geometry
+  labelUpdateRate: 30       // Labels update at 30fps (sufficient for static)
+};
 ```
-
-The system runs continuously without any user interaction. Each frame:
-1. Physics engine calculates new positions based on forces (gravity, electromagnetic, molecular)
-2. Three.js scene updates mesh positions and shader uniforms
-3. WebGL renders the frame
-4. Loop repeats at 60fps
 
 ---
 
@@ -492,64 +566,171 @@ void main() {
 }
 ```
 
-### 4. Autonomous Camera System
+### 4. Dual-Mode Camera System
 
-Since this is a view-only experience, the camera operates autonomously to showcase the visualizations from optimal angles.
+The camera behavior changes based on the current viewing mode.
 
-#### Auto-Orbit Camera
+#### Mode-Aware Camera Controller
 ```javascript
-class AutoOrbitCamera {
-  constructor(camera, target, options = {}) {
-    this.camera = camera;
-    this.target = target;  // Point to orbit around
+import { useRef, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 
-    // Orbit parameters
-    this.radius = options.radius || 10;
-    this.speed = options.speed || 0.1;  // Radians per second
-    this.elevation = options.elevation || 0.3;  // Vertical offset
-    this.elevationVariation = options.elevationVariation || 0.2;
+export function DualModeCamera({ mode, config }) {
+  const { camera } = useThree();
+  const controlsRef = useRef();
+  const angleRef = useRef(0);
 
-    this.angle = 0;
-  }
+  useFrame((state, delta) => {
+    if (mode === 'animated') {
+      // Auto-orbit in animated mode
+      angleRef.current += config.animated.speed * delta;
 
-  update(delta) {
-    // Slowly orbit around the target
-    this.angle += this.speed * delta;
+      const elevation = config.animated.elevation +
+        Math.sin(angleRef.current * 0.3) * 0.2;
 
-    // Calculate new camera position
-    const elevation = this.elevation +
-      Math.sin(this.angle * 0.5) * this.elevationVariation;
+      camera.position.x = Math.cos(angleRef.current) * config.animated.distance;
+      camera.position.z = Math.sin(angleRef.current) * config.animated.distance;
+      camera.position.y = config.animated.distance * elevation;
 
-    this.camera.position.x = this.target.x + Math.cos(this.angle) * this.radius;
-    this.camera.position.z = this.target.z + Math.sin(this.angle) * this.radius;
-    this.camera.position.y = this.target.y + elevation * this.radius;
+      camera.lookAt(0, 0, 0);
+    }
+    // In interactive mode, OrbitControls handles camera
+  });
 
-    // Always look at target
-    this.camera.lookAt(this.target);
-  }
+  return (
+    <>
+      {mode === 'interactive' && (
+        <OrbitControls
+          ref={controlsRef}
+          enablePan={false}
+          minDistance={config.interactive.minDistance}
+          maxDistance={config.interactive.maxDistance}
+          enableDamping
+          dampingFactor={0.05}
+        />
+      )}
+    </>
+  );
 }
 ```
 
-#### Cinematic Camera Paths
+#### Mode Behaviors
+
+| Feature | Animated Mode | Interactive Mode |
+|---------|---------------|------------------|
+| Camera Control | Auto-orbit | User drag/scroll |
+| Physics | Running | Paused |
+| Labels | Hidden | Visible |
+| Animation | Active | Frozen at current state |
+
+### 5. Label System (Interactive Mode)
+
+Labels provide educational annotations when in interactive mode.
+
+#### Label Component
 ```javascript
-// Pre-defined camera paths for dramatic reveals
-const cinematicPath = {
-  keyframes: [
-    { position: [0, 5, 15], target: [0, 0, 0], duration: 10 },
-    { position: [10, 3, 10], target: [0, 0, 0], duration: 8 },
-    { position: [0, 8, 8], target: [0, 0, 0], duration: 12 },
-    { position: [-8, 4, 12], target: [0, 0, 0], duration: 10 }
-  ],
-  loop: true,
-  easing: 'power2.inOut'
-};
+import { Html } from '@react-three/drei';
+
+export function DiagramLabel({
+  position,
+  text,
+  description,
+  visible = true,
+  attachTo  // Optional ref to mesh
+}) {
+  if (!visible) return null;
+
+  return (
+    <Html
+      position={position}
+      center
+      distanceFactor={10}
+      occlude
+      style={{
+        transition: 'opacity 0.3s',
+        opacity: visible ? 1 : 0,
+        pointerEvents: 'none'
+      }}
+    >
+      <div className="diagram-label">
+        <div className="label-line" />
+        <div className="label-content">
+          <span className="label-text">{text}</span>
+          {description && (
+            <span className="label-description">{description}</span>
+          )}
+        </div>
+      </div>
+    </Html>
+  );
+}
 ```
 
-#### Viewing Modes
-- **Orbit**: Camera slowly circles the visualization (default)
-- **Drift**: Gentle, random camera movement for ambient viewing
-- **Fixed**: Static camera position for focused observation
-- **Cinematic**: Smooth transitions between pre-set dramatic angles
+#### Label Styling
+```css
+.diagram-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', system-ui, sans-serif;
+  white-space: nowrap;
+}
+
+.label-line {
+  width: 30px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.label-content {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.label-text {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.label-description {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  margin-top: 4px;
+}
+```
+
+#### Label Manager
+```javascript
+// Manages all labels for a visualization
+export function LabelManager({ labels, visible, meshRefs }) {
+  return (
+    <group>
+      {labels.map(label => {
+        // If label is attached to a mesh, track its position
+        const position = label.attachTo && meshRefs[label.attachTo]
+          ? meshRefs[label.attachTo].current?.position.toArray()
+          : label.position;
+
+        return (
+          <DiagramLabel
+            key={label.id}
+            position={position}
+            text={label.text}
+            description={label.description}
+            visible={visible}
+          />
+        );
+      })}
+    </group>
+  );
+}
+```
 
 ---
 
@@ -681,29 +862,60 @@ function ParticleField({ count = 10000, color = '#00D9FF' }) {
 ### State Management Pattern
 
 ```javascript
-// Zustand store for scene state (no user controls)
-import create from 'zustand';
+// Zustand store for application state
+import { create } from 'zustand';
 
-export const useSceneStore = create((set, get) => ({
-  // Physics parameters (fixed, no user modification)
-  gravity: -9.82,
-  timeScale: 1.0,
+export const useAppStore = create((set, get) => ({
+  // View mode: 'animated' or 'interactive'
+  mode: 'animated',
 
-  // Scene state
-  currentVisualization: 'atom',  // 'atom' | 'solar-system' | 'dna-helix'
+  // Current visualization
+  currentVisualization: 'atom',
+
+  // Physics state
   elapsedTime: 0,
+  isPaused: false,  // Paused in interactive mode
 
-  // Internal actions (called by animation loop, not user)
-  tick: (delta) => set((state) => ({
-    elapsedTime: state.elapsedTime + delta
+  // Actions
+  toggleMode: () => set((state) => ({
+    mode: state.mode === 'animated' ? 'interactive' : 'animated',
+    isPaused: state.mode === 'animated'  // Pause when switching to interactive
   })),
 
+  setVisualization: (id) => set({ currentVisualization: id }),
+
+  tick: (delta) => {
+    const { isPaused } = get();
+    if (!isPaused) {
+      set((state) => ({ elapsedTime: state.elapsedTime + delta }));
+    }
+  },
+
   // Computed
-  getTimeStep: () => (1/60) * get().timeScale
+  getTimeStep: () => {
+    const { isPaused } = get();
+    return isPaused ? 0 : 1/60;
+  }
 }));
 ```
 
-> **Note**: No user-facing actions like `togglePause` or `selectDiagram`. The visualization runs autonomously.
+#### Mode Toggle UI
+```javascript
+// Simple floating button to toggle modes
+export function ModeToggle() {
+  const { mode, toggleMode } = useAppStore();
+
+  return (
+    <button
+      onClick={toggleMode}
+      className="mode-toggle"
+      aria-label={`Switch to ${mode === 'animated' ? 'interactive' : 'animated'} mode`}
+    >
+      {mode === 'animated' ? '🔍 Explore' : '▶️ Animate'}
+    </button>
+  );
+}
+```
 
 ### Testing Strategy
 
@@ -724,53 +936,71 @@ aesthetica-physica/
 │   │   │   ├── electron-glow.png
 │   │   │   ├── planet-surfaces/
 │   │   │   └── particle-sprites/
-│   │   └── hdri/              # Environment maps for reflections
+│   │   └── hdri/                  # Environment maps for reflections
 │   └── index.html
 ├── src/
+│   ├── visualizations/            # MODULAR: Each visualization is self-contained
+│   │   ├── index.ts               # Visualization registry
+│   │   ├── types.ts               # Shared interfaces
+│   │   ├── atom/
+│   │   │   ├── Atom.tsx           # Main component
+│   │   │   ├── labels.ts          # Label definitions
+│   │   │   ├── physics.ts         # Electron motion physics
+│   │   │   └── config.ts          # Camera, timing configs
+│   │   ├── solar-system/
+│   │   │   ├── SolarSystem.tsx
+│   │   │   ├── labels.ts
+│   │   │   ├── physics.ts         # Orbital mechanics
+│   │   │   └── config.ts
+│   │   └── dna-helix/
+│   │       ├── DNAHelix.tsx
+│   │       ├── labels.ts
+│   │       ├── physics.ts         # Molecular dynamics
+│   │       └── config.ts
 │   ├── components/
-│   │   ├── visualizations/    # The three main visualizations
-│   │   │   ├── Atom.jsx           # Atomic model with electron clouds
-│   │   │   ├── SolarSystem.jsx    # Orbital mechanics
-│   │   │   └── DNAHelix.jsx       # Double helix structure
-│   │   ├── effects/           # Visual effects and particles
-│   │   │   ├── ElectronCloud.jsx
-│   │   │   ├── OrbitalTrail.jsx
-│   │   │   └── MolecularBond.jsx
-│   │   └── scene/             # Scene setup (no UI controls)
-│   │       ├── AutoCamera.jsx     # Autonomous orbiting camera
-│   │       ├── Lighting.jsx
-│   │       └── PostProcessing.jsx
+│   │   ├── core/                  # Core reusable components
+│   │   │   ├── DualModeCamera.tsx # Animated/Interactive camera
+│   │   │   ├── LabelManager.tsx   # Manages diagram labels
+│   │   │   ├── DiagramLabel.tsx   # Individual label component
+│   │   │   └── ModeToggle.tsx     # Mode switch button
+│   │   ├── effects/               # Visual effects
+│   │   │   ├── GlowEffect.tsx
+│   │   │   ├── TrailEffect.tsx
+│   │   │   └── ParticleSystem.tsx
+│   │   └── scene/                 # Scene setup
+│   │       ├── Lighting.tsx
+│   │       ├── Environment.tsx
+│   │       └── PostProcessing.tsx
 │   ├── physics/
-│   │   ├── OrbitalMechanics.js    # Kepler's laws, n-body
-│   │   ├── AtomicPhysics.js       # Electron behavior, orbitals
-│   │   ├── MolecularDynamics.js   # DNA helix forces
-│   │   └── ParticleSystem.js
+│   │   ├── OrbitalMechanics.ts    # Kepler's laws, n-body
+│   │   ├── AtomicPhysics.ts       # Electron behavior
+│   │   ├── MolecularDynamics.ts   # DNA helix forces
+│   │   └── ParticleSystem.ts
 │   ├── shaders/
 │   │   ├── common/
 │   │   │   ├── noise.glsl
 │   │   │   ├── math.glsl
 │   │   │   └── lighting.glsl
 │   │   ├── materials/
-│   │   │   ├── electron.frag      # Glowing electron effect
-│   │   │   ├── planet.frag        # Planet surface shader
-│   │   │   ├── dna-strand.frag    # DNA backbone glow
-│   │   │   └── orbital-trail.frag # Fading orbital paths
+│   │   │   ├── glow.frag
+│   │   │   ├── trail.frag
+│   │   │   └── particle.vert
 │   │   └── post/
 │   │       └── bloom.frag
-│   ├── utils/
-│   │   ├── math.js
-│   │   ├── geometry.js
-│   │   └── colors.js
 │   ├── stores/
-│   │   └── sceneStore.js      # Minimal state, no user controls
+│   │   └── appStore.ts            # Mode, visualization state
 │   ├── hooks/
-│   │   ├── useOrbitalPhysics.js
-│   │   └── useAutoCamera.js
+│   │   ├── useVisualization.ts    # Load visualization module
+│   │   ├── usePhysicsLoop.ts      # Physics update loop
+│   │   └── useDualModeCamera.ts
+│   ├── styles/
+│   │   ├── labels.css             # Label styling
+│   │   └── ui.css                 # Mode toggle, etc.
 │   ├── constants/
-│   │   ├── physics.js         # Physical constants (G, k, etc.)
-│   │   └── visuals.js         # Color palettes, sizes
-│   ├── App.jsx
-│   └── main.jsx
+│   │   ├── physics.ts             # Physical constants
+│   │   └── visuals.ts             # Colors, sizes
+│   ├── App.tsx
+│   └── main.tsx
 ├── tests/
 │   ├── visual/
 │   ├── physics/
@@ -781,6 +1011,34 @@ aesthetica-physica/
 ├── vite.config.js
 ├── tsconfig.json
 └── README.md
+```
+
+### Adding a New Visualization
+
+To add a new visualization (e.g., "Galaxy"), create a new folder:
+
+```
+src/visualizations/galaxy/
+├── Galaxy.tsx        # Main component
+├── labels.ts         # Educational labels
+├── physics.ts        # Galaxy rotation physics
+└── config.ts         # Camera settings
+```
+
+Then register it in `src/visualizations/index.ts`:
+
+```typescript
+import { atom } from './atom';
+import { solarSystem } from './solar-system';
+import { dnaHelix } from './dna-helix';
+import { galaxy } from './galaxy';  // New!
+
+export const visualizations = {
+  atom,
+  'solar-system': solarSystem,
+  'dna-helix': dnaHelix,
+  galaxy  // New!
+};
 ```
 
 ---
@@ -801,6 +1059,56 @@ A stylized atomic model featuring a glowing nucleus surrounded by dynamic electr
 - **Orbital Motion**: Probabilistic cloud visualization rather than Bohr model orbits
 - **Nucleus**: Subtle pulsing representing nuclear energy
 
+#### Labels (Interactive Mode)
+```typescript
+// src/visualizations/atom/labels.ts
+export const atomLabels: Label[] = [
+  {
+    id: 'nucleus',
+    text: 'Nucleus',
+    description: 'Contains protons (+) and neutrons',
+    position: [0, 0, 0],
+    attachTo: 'nucleus-mesh'
+  },
+  {
+    id: 'proton',
+    text: 'Protons',
+    description: '6 protons (Carbon atom)',
+    position: [0.3, 0.3, 0]
+  },
+  {
+    id: 'neutron',
+    text: 'Neutrons',
+    description: '6 neutrons (neutral charge)',
+    position: [-0.3, -0.3, 0]
+  },
+  {
+    id: 'electron-shell-1',
+    text: '1st Shell (K)',
+    description: '2 electrons in 1s orbital',
+    position: [2, 0, 0]
+  },
+  {
+    id: 'electron-shell-2',
+    text: '2nd Shell (L)',
+    description: '4 electrons in 2s/2p orbitals',
+    position: [3.5, 0, 0]
+  },
+  {
+    id: 'electron',
+    text: 'Electron',
+    description: 'Negative charge, orbits nucleus',
+    attachTo: 'electron-0'  // Follows first electron
+  },
+  {
+    id: 'orbital-cloud',
+    text: 'Electron Cloud',
+    description: 'Probability density of electron location',
+    position: [2.5, 2, 0]
+  }
+];
+```
+
 #### Visual Design
 ```javascript
 // Atom configuration
@@ -818,8 +1126,8 @@ const atomConfig = {
     trailLength: 50
   },
   camera: {
-    orbitSpeed: 0.05,    // Slow, contemplative orbit
-    distance: 15
+    animated: { distance: 15, speed: 0.05, elevation: 0.3 },
+    interactive: { minDistance: 5, maxDistance: 30 }
   }
 };
 ```
@@ -851,6 +1159,74 @@ A miniature solar system with planets orbiting a glowing sun, following Kepleria
 - **Elliptical Orbits**: Proper eccentricity for each planet
 - **Orbital Periods**: Proportional to real planet ratios (compressed timescale)
 
+#### Labels (Interactive Mode)
+```typescript
+// src/visualizations/solar-system/labels.ts
+export const solarSystemLabels: Label[] = [
+  {
+    id: 'sun',
+    text: 'Sun',
+    description: 'Yellow dwarf star, center of our solar system',
+    position: [0, 2.5, 0],
+    attachTo: 'sun-mesh'
+  },
+  {
+    id: 'mercury',
+    text: 'Mercury',
+    description: 'Smallest planet, closest to Sun',
+    attachTo: 'mercury-mesh'
+  },
+  {
+    id: 'venus',
+    text: 'Venus',
+    description: 'Hottest planet, retrograde rotation',
+    attachTo: 'venus-mesh'
+  },
+  {
+    id: 'earth',
+    text: 'Earth',
+    description: 'Our home, only known planet with life',
+    attachTo: 'earth-mesh'
+  },
+  {
+    id: 'mars',
+    text: 'Mars',
+    description: 'The Red Planet, has polar ice caps',
+    attachTo: 'mars-mesh'
+  },
+  {
+    id: 'jupiter',
+    text: 'Jupiter',
+    description: 'Largest planet, gas giant',
+    attachTo: 'jupiter-mesh'
+  },
+  {
+    id: 'saturn',
+    text: 'Saturn',
+    description: 'Famous for its ring system',
+    attachTo: 'saturn-mesh'
+  },
+  {
+    id: 'saturn-rings',
+    text: 'Rings of Saturn',
+    description: 'Made of ice and rock particles',
+    position: [20, 0.5, 3]
+  },
+  {
+    id: 'orbital-path',
+    text: 'Orbital Path',
+    description: 'Elliptical orbit following Kepler\'s laws',
+    position: [7, 0, 5]
+  },
+  {
+    id: 'asteroid-belt',
+    text: 'Asteroid Belt',
+    description: 'Region between Mars and Jupiter',
+    position: [11, 0, 0]
+  }
+];
+```
+
 #### Visual Design
 ```javascript
 // Solar system configuration
@@ -870,9 +1246,8 @@ const solarSystemConfig = {
     { name: 'saturn', radius: 0.45, orbit: 20, period: 25, color: '#F4A460', rings: true }
   ],
   camera: {
-    orbitSpeed: 0.02,
-    elevation: 0.4,  // Angled view to see orbital planes
-    distance: 35
+    animated: { distance: 35, speed: 0.02, elevation: 0.4 },
+    interactive: { minDistance: 10, maxDistance: 60 }
   }
 };
 ```
@@ -905,6 +1280,81 @@ A rotating double helix structure with base pairs and molecular dynamics simulat
 - **Backbone Tension**: Phosphate-sugar backbone modeled with constraints
 - **Thermal Motion**: Subtle vibration representing molecular energy
 
+#### Labels (Interactive Mode)
+```typescript
+// src/visualizations/dna-helix/labels.ts
+export const dnaHelixLabels: Label[] = [
+  {
+    id: 'double-helix',
+    text: 'Double Helix',
+    description: 'Two intertwined strands forming the DNA structure',
+    position: [0, 5, 2]
+  },
+  {
+    id: 'backbone-1',
+    text: 'Sugar-Phosphate Backbone',
+    description: 'Structural support made of deoxyribose and phosphate',
+    position: [1.2, 3, 0],
+    attachTo: 'backbone-strand-1'
+  },
+  {
+    id: 'backbone-2',
+    text: 'Complementary Strand',
+    description: 'Antiparallel strand (runs in opposite direction)',
+    position: [-1.2, 4, 0],
+    attachTo: 'backbone-strand-2'
+  },
+  {
+    id: 'adenine',
+    text: 'Adenine (A)',
+    description: 'Pairs with Thymine via 2 hydrogen bonds',
+    position: [0.5, 2, 0.5]
+  },
+  {
+    id: 'thymine',
+    text: 'Thymine (T)',
+    description: 'Pairs with Adenine via 2 hydrogen bonds',
+    position: [-0.5, 2, -0.5]
+  },
+  {
+    id: 'guanine',
+    text: 'Guanine (G)',
+    description: 'Pairs with Cytosine via 3 hydrogen bonds',
+    position: [0.5, 4, 0.5]
+  },
+  {
+    id: 'cytosine',
+    text: 'Cytosine (C)',
+    description: 'Pairs with Guanine via 3 hydrogen bonds',
+    position: [-0.5, 4, -0.5]
+  },
+  {
+    id: 'hydrogen-bond',
+    text: 'Hydrogen Bonds',
+    description: 'Weak bonds holding base pairs together',
+    position: [0, 3, 0]
+  },
+  {
+    id: 'major-groove',
+    text: 'Major Groove',
+    description: 'Wider groove, important for protein binding',
+    position: [0.8, 6, 0.8]
+  },
+  {
+    id: 'minor-groove',
+    text: 'Minor Groove',
+    description: 'Narrower groove on opposite side',
+    position: [-0.8, 1, -0.8]
+  },
+  {
+    id: 'base-pair',
+    text: 'Base Pair',
+    description: 'One rung of the DNA ladder (A-T or G-C)',
+    position: [0, 0, 1]
+  }
+];
+```
+
 #### Visual Design
 ```javascript
 // DNA helix configuration
@@ -926,9 +1376,8 @@ const dnaConfig = {
     glowIntensity: 0.5
   },
   camera: {
-    orbitSpeed: 0.08,
-    verticalDrift: true,     // Camera slowly moves up/down helix
-    distance: 12
+    animated: { distance: 12, speed: 0.08, elevation: 0.2, verticalDrift: true },
+    interactive: { minDistance: 4, maxDistance: 20 }
   }
 };
 ```
@@ -1671,36 +2120,65 @@ This document serves as the master blueprint for **Aesthetica Physica**. It shou
 ### Design Philosophy
 
 Every visualization we create should:
-1. **Mesmerize** - Viewers should be drawn into continuous observation
-2. **Inspire Wonder** - Beauty should spark curiosity about nature
-3. **Perform Flawlessly** - 60fps is non-negotiable for smooth, hypnotic motion
+1. **Mesmerize** - In animated mode, viewers are drawn into continuous observation
+2. **Educate** - In interactive mode, labels provide textbook-quality information
+3. **Perform Flawlessly** - 60fps is non-negotiable; zero lag, zero stuttering
 4. **Respect Physics** - All motion emerges from accurate physical simulation
+5. **Scale Gracefully** - Modular architecture allows unlimited expansion
 
-### The View-Only Experience
+### The Dual-Mode Experience
 
-Remember: **No user input whatsoever.** The website is a window into beautiful, autonomous physics simulations. Visitors watch, contemplate, and appreciate—like observing an aquarium or gazing at stars. The absence of controls is a feature, not a limitation. It creates:
+**Animated Mode** (Default):
+- Pure visual contemplation
+- Auto-orbiting cinematic camera
+- Physics-driven continuous animation
+- No UI elements visible
 
-- **Immediacy**: No learning curve, instant immersion
-- **Calm**: No decisions to make, pure observation
-- **Universality**: Works the same for everyone
-- **Ambient Quality**: Can run indefinitely as digital art
+**Interactive Mode** (Toggle):
+- User controls the camera (drag to rotate, scroll to zoom)
+- Educational labels appear on all diagram parts
+- Animation pauses for detailed examination
+- Traditional scientific diagram experience in 3D
+
+### Performance Non-Negotiables
+
+```javascript
+// These targets must be met at all times
+const MANDATORY_PERFORMANCE = {
+  fps: 60,                    // Never drop below
+  frameTime: '<16.67ms',      // Every frame
+  inputLatency: '<50ms',      // For interactive mode
+  labelRender: '<5ms',        // Labels must not impact performance
+  transitionTime: '300ms'     // Mode switch animation
+};
+```
+
+### Extensibility
+
+The modular architecture makes adding new visualizations straightforward:
+1. Create a new folder in `src/visualizations/`
+2. Implement the `Visualization` interface
+3. Define labels for interactive mode
+4. Register in the visualization index
+5. Done - no changes to core code required
 
 ### Next Steps
 
-1. Initialize project with Vite + React + Three.js
-2. Set up base scene with autonomous camera
-3. Implement The Atom visualization first
-4. Add The Solar System and DNA Helix
-5. Polish with post-processing and ambient effects
-6. Deploy as a simple, beautiful web gallery
+1. Initialize project with Vite + React + TypeScript + Three.js
+2. Implement core infrastructure (mode controller, camera system, label manager)
+3. Create The Atom visualization with full label set
+4. Add The Solar System with orbital mechanics
+5. Build The DNA Helix with molecular dynamics
+6. Performance optimization and testing
+7. Deploy as a polished web gallery
 
 ---
 
-**Document Version**: 1.1
+**Document Version**: 2.0
 **Last Updated**: 2025-11-21
 **Author**: Senior Creative Technologist & Physics Engine Architect
 **Project**: Aesthetica Physica
 
 ---
 
-*"Where physics meets poetry, and code becomes contemplation."*
+*"Where physics meets poetry, and diagrams become art."*
