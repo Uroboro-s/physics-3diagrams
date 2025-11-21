@@ -25,23 +25,31 @@
 ## Project Vision & Philosophy
 
 ### Mission Statement
-**Aesthetica Physica** reimagines standard physics diagrams as high-end, interactive generative art experiences. We move beyond static textbook illustrations to create cinematic, real-time 3D visualizations that maintain scientific accuracy while achieving museum-quality aesthetics.
+**Aesthetica Physica** is a view-only web gallery showcasing physics-driven 3D visualizations as high-end generative art. Visitors observe mesmerizing, autonomous animations—atoms pulsing with electron clouds, solar systems in graceful orbital dance, DNA helices twisting through space—all governed by real physics simulations. No interaction required; pure visual contemplation.
 
 ### Core Principles
 
-1. **Scientific Accuracy First**: Every visualization must be physically accurate and educationally valid
+1. **Physics-Driven Motion**: All movement is determined by accurate physics simulation (gravity, electromagnetism, molecular forces)
 2. **Cinematic Quality**: AAA game-level graphics, film-quality rendering
-3. **Interactive Exploration**: Users should feel empowered to manipulate and understand physics
+3. **Autonomous Beauty**: Visualizations run continuously without user input—digital art installations
 4. **Performance Excellence**: 60fps on modern hardware, graceful degradation on older devices
-5. **Generative Aesthetics**: Procedural, shader-driven visuals that feel alive
+5. **Generative Aesthetics**: Procedural, shader-driven visuals that feel alive and ever-evolving
+
+### Experience Philosophy
+
+This is a **view-only gallery**. There are no controls, no buttons, no user input. Visitors arrive at the website and are immediately immersed in beautiful, physics-accurate visualizations. The experience is:
+- **Contemplative**: Like watching a lava lamp or aquarium
+- **Mesmerizing**: Continuous, hypnotic motion
+- **Educational by Osmosis**: Physics principles revealed through observation
+- **Ambient**: Can run in the background as digital art
 
 ### Target Audience
 
-- Physics students seeking intuitive understanding
-- Educators looking for engaging teaching tools
-- Digital artists exploring scientific visualization
-- Science communicators and content creators
-- Museum installations and exhibitions
+- Digital art enthusiasts and collectors
+- Science lovers seeking ambient visualizations
+- Offices and spaces wanting dynamic digital art displays
+- Museums and exhibitions for installation pieces
+- Anyone who appreciates the beauty of physics in motion
 
 ---
 
@@ -89,13 +97,13 @@ Custom Physics Layer
 - GPU acceleration: Handle thousands of particles at 60fps
 - Flexibility: Scientific accuracy over gaming physics
 
-#### UI & State Management
+#### Application Layer
 ```
 React 18+
 ├── Functional components with hooks
-├── Zustand (lightweight state management)
+├── Zustand (scene state management)
 ├── React Three Fiber (declarative Three.js)
-└── Leva (debug GUI)
+└── No user controls (view-only experience)
 ```
 
 #### Build & Development
@@ -120,7 +128,6 @@ Vite 5+
     "react-dom": "^18.2.0",
     "cannon-es": "^0.20.0",
     "zustand": "^4.5.0",
-    "leva": "^0.9.35",
     "gsap": "^3.12.0",
     "maath": "^0.10.7",
     "glsl-noise": "^0.0.0"
@@ -134,6 +141,8 @@ Vite 5+
 }
 ```
 
+> **Note**: No UI libraries (like Leva) are needed since this is a view-only experience with no user controls.
+
 ---
 
 ## Architecture Overview
@@ -142,13 +151,8 @@ Vite 5+
 
 ```
 ┌─────────────────────────────────────────────────┐
-│          React UI Layer (2D Overlay)            │
-│  Controls | Info Panels | Debug GUI             │
-└─────────────────────────────────────────────────┘
-                      ↕
-┌─────────────────────────────────────────────────┐
-│         State Management (Zustand)              │
-│  Scene State | Physics Params | UI State        │
+│         Scene Management (Zustand)              │
+│  Scene State | Physics Params | Animation Time  │
 └─────────────────────────────────────────────────┘
                       ↕
 ┌─────────────────────────────────────────────────┐
@@ -162,24 +166,31 @@ Vite 5+
 ┌─────────────────────────────────────────────────┐
 │         Physics Simulation Layer                │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-│  │ Rigid    │  │ Particle │  │ Field    │      │
-│  │ Bodies   │  │ Systems  │  │ Solvers  │      │
+│  │ Orbital  │  │ Particle │  │ Molecular│      │
+│  │ Mechanics│  │ Systems  │  │ Dynamics │      │
 │  └──────────┘  └──────────┘  └──────────┘      │
 └─────────────────────────────────────────────────┘
                       ↕
 ┌─────────────────────────────────────────────────┐
 │         GPU Compute Layer (Shaders)             │
-│  Particle Updates | Field Calculations          │
+│  Particle Updates | Orbital Calculations        │
 └─────────────────────────────────────────────────┘
 ```
 
-### Data Flow
+### Data Flow (Autonomous Loop)
 
 ```javascript
-User Input → State Update → Physics Tick → Scene Update → Render
-     ↓                          ↓              ↓            ↓
- UI Events              Forces/Constraints   Positions   WebGL
+// No user input - fully autonomous animation loop
+Animation Frame → Physics Tick → Scene Update → Render → Next Frame
+                       ↓              ↓            ↓
+               Forces/Orbits      Positions     WebGL
 ```
+
+The system runs continuously without any user interaction. Each frame:
+1. Physics engine calculates new positions based on forces (gravity, electromagnetic, molecular)
+2. Three.js scene updates mesh positions and shader uniforms
+3. WebGL renders the frame
+4. Loop repeats at 60fps
 
 ---
 
@@ -202,9 +213,10 @@ const rendererConfig = {
 ```
 
 #### Camera System
-- **Primary**: PerspectiveCamera with orbital controls
-- **Cinematic**: Animated camera paths using GSAP
-- **Debug**: OrthographicCamera for technical views
+- **Primary**: PerspectiveCamera with automated orbiting (no user controls)
+- **Cinematic**: Smooth, looping camera paths using GSAP
+- **Dynamic**: Camera slowly orbits around visualizations for varied perspectives
+- **Auto-framing**: Automatically adjusts to keep subjects centered
 
 #### Lighting Philosophy
 ```javascript
@@ -480,55 +492,64 @@ void main() {
 }
 ```
 
-### 4. Interaction System
+### 4. Autonomous Camera System
 
-#### Input Handling
+Since this is a view-only experience, the camera operates autonomously to showcase the visualizations from optimal angles.
+
+#### Auto-Orbit Camera
 ```javascript
-class InteractionManager {
-  constructor(camera, scene, domElement) {
-    this.raycaster = new THREE.Raycaster();
-    this.mouse = new THREE.Vector2();
+class AutoOrbitCamera {
+  constructor(camera, target, options = {}) {
     this.camera = camera;
-    this.scene = scene;
+    this.target = target;  // Point to orbit around
 
-    // Event listeners
-    domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-    domElement.addEventListener('click', this.onClick.bind(this));
-    domElement.addEventListener('wheel', this.onWheel.bind(this));
+    // Orbit parameters
+    this.radius = options.radius || 10;
+    this.speed = options.speed || 0.1;  // Radians per second
+    this.elevation = options.elevation || 0.3;  // Vertical offset
+    this.elevationVariation = options.elevationVariation || 0.2;
+
+    this.angle = 0;
   }
 
-  onMouseMove(event) {
-    // Normalize mouse coordinates
-    this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  update(delta) {
+    // Slowly orbit around the target
+    this.angle += this.speed * delta;
 
-    // Raycast
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(
-      this.scene.children, true
-    );
+    // Calculate new camera position
+    const elevation = this.elevation +
+      Math.sin(this.angle * 0.5) * this.elevationVariation;
 
-    if (intersects.length > 0) {
-      this.handleHover(intersects[0]);
-    }
-  }
+    this.camera.position.x = this.target.x + Math.cos(this.angle) * this.radius;
+    this.camera.position.z = this.target.z + Math.sin(this.angle) * this.radius;
+    this.camera.position.y = this.target.y + elevation * this.radius;
 
-  handleHover(intersection) {
-    // Highlight object, show tooltip, etc.
-    const object = intersection.object;
-    if (object.userData.interactive) {
-      object.material.emissive.setHex(0x444444);
-    }
+    // Always look at target
+    this.camera.lookAt(this.target);
   }
 }
 ```
 
-#### Gesture Controls
-- **Orbit**: Click + drag to rotate camera
-- **Pan**: Right-click + drag to pan
-- **Zoom**: Scroll to zoom
-- **Select**: Click on interactive objects
-- **Manipulate**: Drag to apply forces or change parameters
+#### Cinematic Camera Paths
+```javascript
+// Pre-defined camera paths for dramatic reveals
+const cinematicPath = {
+  keyframes: [
+    { position: [0, 5, 15], target: [0, 0, 0], duration: 10 },
+    { position: [10, 3, 10], target: [0, 0, 0], duration: 8 },
+    { position: [0, 8, 8], target: [0, 0, 0], duration: 12 },
+    { position: [-8, 4, 12], target: [0, 0, 0], duration: 10 }
+  ],
+  loop: true,
+  easing: 'power2.inOut'
+};
+```
+
+#### Viewing Modes
+- **Orbit**: Camera slowly circles the visualization (default)
+- **Drift**: Gentle, random camera movement for ambient viewing
+- **Fixed**: Static camera position for focused observation
+- **Cinematic**: Smooth transitions between pre-set dramatic angles
 
 ---
 
@@ -595,11 +616,11 @@ const fieldPalette = {
 
 ### Animation Principles
 
-1. **Easing**: Use physically-based easing (not linear)
-2. **Timing**: Follow 12 principles of animation
-3. **Continuity**: Smooth transitions, no pops
-4. **Purposeful Motion**: Every animation should teach or reveal
-5. **Performance**: Prefer GPU animation (shaders) over CPU
+1. **Physics-Driven**: All motion emerges from physical simulation, not keyframes
+2. **Continuous Flow**: Animations loop seamlessly without obvious restart points
+3. **Varied Tempo**: Mix slow, contemplative motion with occasional dynamic moments
+4. **Natural Rhythm**: Orbital periods, molecular vibrations, and oscillations feel organic
+5. **Performance**: Prefer GPU animation (shaders) over CPU for smooth 60fps
 
 ---
 
@@ -660,28 +681,29 @@ function ParticleField({ count = 10000, color = '#00D9FF' }) {
 ### State Management Pattern
 
 ```javascript
-// Zustand store for global state
+// Zustand store for scene state (no user controls)
 import create from 'zustand';
 
-export const usePhysicsStore = create((set, get) => ({
-  // State
+export const useSceneStore = create((set, get) => ({
+  // Physics parameters (fixed, no user modification)
   gravity: -9.82,
   timeScale: 1.0,
-  isPaused: false,
-  selectedDiagram: null,
 
-  // Actions
-  setGravity: (g) => set({ gravity: g }),
-  togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
-  selectDiagram: (id) => set({ selectedDiagram: id }),
+  // Scene state
+  currentVisualization: 'atom',  // 'atom' | 'solar-system' | 'dna-helix'
+  elapsedTime: 0,
+
+  // Internal actions (called by animation loop, not user)
+  tick: (delta) => set((state) => ({
+    elapsedTime: state.elapsedTime + delta
+  })),
 
   // Computed
-  getEffectiveTimeStep: () => {
-    const { timeScale, isPaused } = get();
-    return isPaused ? 0 : (1/60) * timeScale;
-  }
+  getTimeStep: () => (1/60) * get().timeScale
 }));
 ```
+
+> **Note**: No user-facing actions like `togglePause` or `selectDiagram`. The visualization runs autonomously.
 
 ### Testing Strategy
 
@@ -699,38 +721,40 @@ aesthetica-physica/
 ├── public/
 │   ├── assets/
 │   │   ├── textures/
-│   │   ├── models/
-│   │   └── fonts/
+│   │   │   ├── electron-glow.png
+│   │   │   ├── planet-surfaces/
+│   │   │   └── particle-sprites/
+│   │   └── hdri/              # Environment maps for reflections
 │   └── index.html
 ├── src/
 │   ├── components/
-│   │   ├── diagrams/
-│   │   │   ├── Pendulum.jsx
-│   │   │   ├── ElectricField.jsx
-│   │   │   ├── DoubleSlit.jsx
-│   │   │   └── [more diagrams...]
-│   │   ├── ui/
-│   │   │   ├── ControlPanel.jsx
-│   │   │   ├── InfoOverlay.jsx
-│   │   │   └── DebugGUI.jsx
-│   │   └── shared/
-│   │       ├── Camera.jsx
+│   │   ├── visualizations/    # The three main visualizations
+│   │   │   ├── Atom.jsx           # Atomic model with electron clouds
+│   │   │   ├── SolarSystem.jsx    # Orbital mechanics
+│   │   │   └── DNAHelix.jsx       # Double helix structure
+│   │   ├── effects/           # Visual effects and particles
+│   │   │   ├── ElectronCloud.jsx
+│   │   │   ├── OrbitalTrail.jsx
+│   │   │   └── MolecularBond.jsx
+│   │   └── scene/             # Scene setup (no UI controls)
+│   │       ├── AutoCamera.jsx     # Autonomous orbiting camera
 │   │       ├── Lighting.jsx
 │   │       └── PostProcessing.jsx
 │   ├── physics/
-│   │   ├── PhysicsEngine.js
-│   │   ├── ParticleSystem.js
-│   │   ├── FieldSolver.js
-│   │   └── RigidBody.js
+│   │   ├── OrbitalMechanics.js    # Kepler's laws, n-body
+│   │   ├── AtomicPhysics.js       # Electron behavior, orbitals
+│   │   ├── MolecularDynamics.js   # DNA helix forces
+│   │   └── ParticleSystem.js
 │   ├── shaders/
 │   │   ├── common/
 │   │   │   ├── noise.glsl
 │   │   │   ├── math.glsl
 │   │   │   └── lighting.glsl
 │   │   ├── materials/
-│   │   │   ├── energy.frag
-│   │   │   ├── holographic.frag
-│   │   │   └── particle.vert
+│   │   │   ├── electron.frag      # Glowing electron effect
+│   │   │   ├── planet.frag        # Planet surface shader
+│   │   │   ├── dna-strand.frag    # DNA backbone glow
+│   │   │   └── orbital-trail.frag # Fading orbital paths
 │   │   └── post/
 │   │       └── bloom.frag
 │   ├── utils/
@@ -738,14 +762,13 @@ aesthetica-physica/
 │   │   ├── geometry.js
 │   │   └── colors.js
 │   ├── stores/
-│   │   ├── physicsStore.js
-│   │   └── uiStore.js
+│   │   └── sceneStore.js      # Minimal state, no user controls
 │   ├── hooks/
-│   │   ├── usePhysics.js
-│   │   └── useInteraction.js
+│   │   ├── useOrbitalPhysics.js
+│   │   └── useAutoCamera.js
 │   ├── constants/
-│   │   ├── physics.js
-│   │   └── visuals.js
+│   │   ├── physics.js         # Physical constants (G, k, etc.)
+│   │   └── visuals.js         # Color palettes, sizes
 │   ├── App.jsx
 │   └── main.jsx
 ├── tests/
@@ -753,9 +776,7 @@ aesthetica-physica/
 │   ├── physics/
 │   └── performance/
 ├── docs/
-│   ├── claude.md (this file)
-│   ├── diagrams.md
-│   └── shaders.md
+│   └── claude.md (this file)
 ├── package.json
 ├── vite.config.js
 ├── tsconfig.json
@@ -764,148 +785,197 @@ aesthetica-physica/
 
 ---
 
-## Physics Diagrams Catalog
+## Visualization Catalog
 
-### Mechanics
+The gallery features three mesmerizing, physics-driven visualizations that run autonomously. Each showcases different physical principles through continuous, contemplative animation.
 
-#### 1. Simple Pendulum
-**Physics**: Harmonic motion, energy conservation
-**Visual Style**: Glowing energy trail, ghosted motion history
-**Interactivity**: Drag to set amplitude, adjust gravity
+---
 
+### 1. The Atom
+
+A stylized atomic model featuring a glowing nucleus surrounded by dynamic electron probability clouds.
+
+#### Physics Simulation
+- **Electron Behavior**: Based on quantum mechanical probability distributions
+- **Energy Levels**: Electrons occupy distinct orbital shells (1s, 2s, 2p, etc.)
+- **Orbital Motion**: Probabilistic cloud visualization rather than Bohr model orbits
+- **Nucleus**: Subtle pulsing representing nuclear energy
+
+#### Visual Design
 ```javascript
-// Key features:
-- Real-time angle/velocity graph overlay
-- Color-coded energy (PE = blue, KE = red)
-- Adjustable string length and mass
-- Damping controls
+// Atom configuration
+const atomConfig = {
+  nucleus: {
+    protons: 6,          // Carbon atom
+    neutrons: 6,
+    glowColor: '#FF6B35',
+    pulseFrequency: 0.5  // Hz
+  },
+  electrons: {
+    count: 6,
+    shells: [2, 4],      // 2 in 1s, 4 in 2s/2p
+    cloudOpacity: 0.3,
+    trailLength: 50
+  },
+  camera: {
+    orbitSpeed: 0.05,    // Slow, contemplative orbit
+    distance: 15
+  }
+};
 ```
 
-#### 2. Double Pendulum
-**Physics**: Chaotic motion, sensitive dependence
-**Visual Style**: Rainbow trail showing path divergence
-**Interactivity**: Set initial conditions, observe butterfly effect
-
-#### 3. Projectile Motion
-**Physics**: Parabolic trajectories, range calculation
-**Visual Style**: Multiple simultaneous trajectories at different angles
-**Interactivity**: Adjust launch angle, velocity, air resistance
-
-#### 4. Collision (Elastic/Inelastic)
-**Physics**: Momentum conservation, energy transfer
-**Visual Style**: Particle burst effects on impact, rippling energy waves
-**Interactivity**: Adjust masses, velocities, coefficient of restitution
-
-### Electromagnetism
-
-#### 5. Electric Field Lines
-**Physics**: Coulomb's law, superposition principle
-**Visual Style**: Flowing, animated field lines with directional particles
-**Interactivity**: Add/remove charges, adjust magnitudes
-
+#### Implementation Notes
 ```javascript
-// Visual features:
-- Equipotential surfaces (semi-transparent)
-- Field strength indicated by line density and glow
-- Interactive test charge shows force direction
+// Electron cloud shader creates probability density visualization
+// Uses 3D noise to simulate quantum uncertainty
+// Electrons appear as bright points moving through the cloud
+// Energy shell transitions shown with color gradient (blue → violet)
 ```
 
-#### 6. Magnetic Field (Bar Magnet)
-**Physics**: Magnetic dipole field
-**Visual Style**: Iron filing simulation, 3D field visualization
-**Interactivity**: Rotate magnet, place compass needles
+#### Visual Features
+- **Nucleus Glow**: Warm orange/red pulsing core
+- **Electron Trails**: Fading paths showing recent electron positions
+- **Probability Clouds**: Semi-transparent orbitals (s, p, d shapes)
+- **Energy Visualization**: Color indicates energy level (cooler = lower energy)
+- **Ambient Particles**: Floating photon-like particles around the atom
 
-#### 7. Electromagnetic Induction
-**Physics**: Faraday's law, Lenz's law
-**Visual Style**: Changing magnetic flux shown with animated field
-**Interactivity**: Move magnet through coil, adjust velocity
+---
 
-#### 8. LC Circuit Oscillation
-**Physics**: Energy oscillation between E and B fields
-**Visual Style**: Pulsing capacitor and inductor with energy flow
-**Interactivity**: Set initial charge, adjust L and C values
+### 2. The Solar System
 
-### Waves & Optics
+A miniature solar system with planets orbiting a glowing sun, following Keplerian orbital mechanics.
 
-#### 9. Wave Interference (2 Sources)
-**Physics**: Constructive/destructive interference
-**Visual Style**: Ripple tank simulation with 3D wave amplitude
-**Interactivity**: Adjust frequency, phase difference, wavelength
+#### Physics Simulation
+- **Orbital Mechanics**: Kepler's laws of planetary motion
+- **Gravitational Forces**: Newton's law of universal gravitation
+- **Elliptical Orbits**: Proper eccentricity for each planet
+- **Orbital Periods**: Proportional to real planet ratios (compressed timescale)
 
-#### 10. Double Slit Experiment
-**Physics**: Wave-particle duality, diffraction
-**Visual Style**: Probability wave visualization, particle detection events
-**Interactivity**: Single photon mode vs. continuous wave
-
+#### Visual Design
 ```javascript
-// Quantum visualization:
-- Build up interference pattern one photon at a time
-- Show wavefronts passing through slits
-- Detector screen with accumulating hits
+// Solar system configuration
+const solarSystemConfig = {
+  sun: {
+    radius: 2,
+    glowColor: '#FEC601',
+    coronaIntensity: 1.5,
+    surfaceAnimation: true  // Animated plasma surface
+  },
+  planets: [
+    { name: 'mercury', radius: 0.1, orbit: 4, period: 2, color: '#A0522D' },
+    { name: 'venus', radius: 0.15, orbit: 5.5, period: 3, color: '#DEB887' },
+    { name: 'earth', radius: 0.16, orbit: 7, period: 5, color: '#4169E1' },
+    { name: 'mars', radius: 0.12, orbit: 9, period: 7, color: '#CD5C5C' },
+    { name: 'jupiter', radius: 0.5, orbit: 14, period: 15, color: '#DAA520' },
+    { name: 'saturn', radius: 0.45, orbit: 20, period: 25, color: '#F4A460', rings: true }
+  ],
+  camera: {
+    orbitSpeed: 0.02,
+    elevation: 0.4,  // Angled view to see orbital planes
+    distance: 35
+  }
+};
 ```
 
-#### 11. Standing Waves
-**Physics**: Resonance, harmonics
-**Visual Style**: 3D rope/string with nodes and antinodes
-**Interactivity**: Select harmonic number, adjust tension
-
-#### 12. Doppler Effect
-**Physics**: Frequency shift due to motion
-**Visual Style**: Compressed/expanded wavefronts, color shift
-**Interactivity**: Adjust source velocity, observer position
-
-### Thermodynamics & Statistical
-
-#### 13. Maxwell-Boltzmann Distribution
-**Physics**: Particle speed distribution in gases
-**Visual Style**: Thousands of particles with color-coded speeds
-**Interactivity**: Adjust temperature, observe distribution histogram
-
-#### 14. Carnot Cycle
-**Physics**: Thermodynamic cycle, PV diagram
-**Visual Style**: 3D PV surface with animated state point
-**Interactivity**: Adjust reservoir temperatures, step through cycle
-
-### Modern Physics
-
-#### 15. Photoelectric Effect
-**Physics**: Photon energy, work function
-**Visual Style**: Incoming photons, ejected electrons with KE visualization
-**Interactivity**: Adjust light frequency and intensity
-
-#### 16. Atomic Orbitals (Hydrogen)
-**Physics**: Quantum mechanical probability densities
-**Visual Style**: Volumetric rendering of ψ², glowing probability clouds
-**Interactivity**: Select orbital (1s, 2p, 3d...), slice through planes
-
+#### Implementation Notes
 ```javascript
-// Advanced viz:
-- Real and imaginary components
-- Phase visualization
-- Cross-section views
+// Orbital mechanics using vis-viva equation
+// v = sqrt(GM * (2/r - 1/a))
+// Each planet follows proper elliptical path
+// Moon systems for Earth and outer planets (optional)
 ```
 
-#### 17. Particle in a Box
-**Physics**: Quantum confinement, energy quantization
-**Visual Style**: Wavefunction with animated time evolution
-**Interactivity**: Select quantum number n, adjust box size
+#### Visual Features
+- **Sun Corona**: Animated plasma effect with rays
+- **Orbital Trails**: Glowing paths showing recent orbit segments
+- **Planet Atmospheres**: Subtle glow around terrestrial planets
+- **Saturn's Rings**: Thousands of instanced particles
+- **Asteroid Belt**: Sparse particle field between Mars and Jupiter
+- **Starfield Background**: Deep space environment
 
-### Advanced Topics
+---
 
-#### 18. Lorenz Attractor
-**Physics**: Chaos theory, strange attractors
-**Visual Style**: Flowing particle stream tracing butterfly path
-**Interactivity**: Adjust parameters (σ, ρ, β), observe sensitivity
+### 3. The DNA Helix
 
-#### 19. Gravitational Lensing
-**Physics**: General relativity, curved spacetime
-**Visual Style**: Distorted background grid, multiple images of source
-**Interactivity**: Adjust mass, observe Einstein ring
+A rotating double helix structure with base pairs and molecular dynamics simulation.
 
-#### 20. Three-Body Problem
-**Physics**: N-body gravity, orbital mechanics
-**Visual Style**: Elegant orbital trails, gravitational field visualization
-**Interactivity**: Set initial conditions, observe chaotic evolution
+#### Physics Simulation
+- **Molecular Dynamics**: Spring forces between base pairs
+- **Helical Geometry**: Accurate 3.4nm pitch, 2nm diameter (scaled)
+- **Backbone Tension**: Phosphate-sugar backbone modeled with constraints
+- **Thermal Motion**: Subtle vibration representing molecular energy
+
+#### Visual Design
+```javascript
+// DNA helix configuration
+const dnaConfig = {
+  structure: {
+    basePairs: 20,           // Number of A-T, G-C pairs
+    pitch: 3.4,              // Height per full turn
+    radius: 1.0,             // Helix radius
+    rotationSpeed: 0.1       // Radians per second
+  },
+  basePairColors: {
+    adenine: '#FF6B6B',      // A - Red
+    thymine: '#4ECDC4',      // T - Teal
+    guanine: '#45B7D1',      // G - Blue
+    cytosine: '#96CEB4'      // C - Green
+  },
+  backbone: {
+    color: '#E8E8E8',
+    glowIntensity: 0.5
+  },
+  camera: {
+    orbitSpeed: 0.08,
+    verticalDrift: true,     // Camera slowly moves up/down helix
+    distance: 12
+  }
+};
+```
+
+#### Implementation Notes
+```javascript
+// DNA structure using parametric helix equations
+// x = r * cos(θ)
+// y = pitch * θ / (2π)
+// z = r * sin(θ)
+// Two intertwined helices offset by 180°
+// Base pairs connect as horizontal rungs
+```
+
+#### Visual Features
+- **Phosphate Backbone**: Glowing twisted rails
+- **Base Pair Bonds**: Hydrogen bonds shown as energy connections
+- **Color Coding**: Each nucleotide type has distinct color
+- **Molecular Vibration**: Subtle thermal motion animation
+- **Depth of Field**: Focus pulls along the helix
+- **Ambient Particles**: Water molecules and ions floating nearby
+
+---
+
+## Additional Visualization Ideas (Future)
+
+These can be added to expand the gallery:
+
+### Cosmic
+- **Galaxy Spiral**: Rotating galaxy with gravitational dynamics
+- **Black Hole**: Accretion disk with gravitational lensing
+- **Nebula**: Particle cloud with stellar formation
+
+### Molecular
+- **Protein Folding**: Amino acid chain finding minimum energy state
+- **Water Molecules**: Hydrogen bonding network
+- **Crystal Lattice**: Growing crystal structure
+
+### Physical Phenomena
+- **Magnetic Field Lines**: 3D field visualization around dipoles
+- **Wave Interference**: Rippling interference patterns
+- **Pendulum Wave**: Multiple pendulums creating wave patterns
+
+### Abstract Physics
+- **Lorenz Attractor**: Chaotic particle stream
+- **Double Pendulum**: Hypnotic chaotic motion
+- **Fluid Simulation**: Calm, flowing liquid dynamics
 
 ---
 
@@ -1207,73 +1277,77 @@ function animate() {
 
 ## Development Roadmap
 
-### Phase 1: Foundation (Weeks 1-2)
-- ✓ Set up Vite + React + Three.js project
-- ✓ Configure build pipeline with shader support
-- ✓ Create base scene with camera, lighting, post-processing
-- ✓ Implement state management with Zustand
-- ✓ Build UI framework with control panel
-- ✓ Set up physics engine integration
+### Phase 1: Foundation (Week 1)
+- [ ] Set up Vite + React + Three.js project
+- [ ] Configure build pipeline with shader support
+- [ ] Create base scene with lighting and post-processing
+- [ ] Implement autonomous camera system
+- [ ] Set up minimal state management
 
-### Phase 2: Core Diagrams (Weeks 3-6)
-- Week 3: Mechanics diagrams (pendulum, projectile, collisions)
-- Week 4: Electromagnetism (fields, induction)
-- Week 5: Waves (interference, standing waves)
-- Week 6: Polish and optimization
+### Phase 2: Core Visualizations (Weeks 2-4)
+- **Week 2: The Atom**
+  - Nucleus with pulsing glow effect
+  - Electron probability cloud shader
+  - Electron particle trails
+  - Auto-orbiting camera
 
-### Phase 3: Advanced Features (Weeks 7-9)
-- Week 7: Modern physics (quantum orbitals, photoelectric effect)
-- Week 8: Advanced shaders (holographic, energy fields)
-- Week 9: Interaction system enhancements
+- **Week 3: The Solar System**
+  - Sun with corona shader
+  - Planet orbital mechanics (Kepler's laws)
+  - Orbital trail effects
+  - Saturn's rings particle system
 
-### Phase 4: Content & Polish (Weeks 10-12)
-- Week 10: Additional diagrams, edge cases
-- Week 11: Educational overlays, info panels, explanations
-- Week 12: Performance optimization, cross-browser testing
+- **Week 4: The DNA Helix**
+  - Double helix geometry generation
+  - Base pair coloring and bonds
+  - Backbone glow shader
+  - Thermal vibration animation
 
-### Phase 5: Launch (Week 13+)
+### Phase 3: Visual Polish (Week 5)
+- Refine post-processing (bloom, color grading)
+- Add environmental effects (starfields, particles)
+- Optimize shader performance
+- Fine-tune camera movements for each visualization
+
+### Phase 4: Testing & Launch (Week 6)
+- Cross-browser testing (Chrome, Firefox, Safari)
+- Performance profiling and optimization
+- Mobile responsiveness check
 - Deploy to production
-- Gather user feedback
-- Plan expansions (more diagrams, VR support)
+
+### Future Expansions
+- Additional visualizations (galaxy, black hole, molecules)
+- WebXR/VR support for immersive viewing
+- Multiple color themes
+- Visualization transitions/morphing
 
 ---
 
 ## Code Patterns & Examples
 
-### Complete Diagram Component Template
+### Atom Visualization Component
 
 ```javascript
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { usePhysicsStore } from '../stores/physicsStore';
 
-export function ExampleDiagram({
-  parameter1 = 1.0,
-  parameter2 = 2.0,
-  color = '#00D9FF'
-}) {
-  // Refs
-  const meshRef = useRef();
-  const physicsRef = useRef({
-    velocity: new THREE.Vector3(),
-    acceleration: new THREE.Vector3()
-  });
+export function Atom({ electrons = 6, nucleusColor = '#FF6B35' }) {
+  const groupRef = useRef();
+  const electronsRef = useRef([]);
 
-  // State
-  const { gravity, timeScale } = usePhysicsStore();
-
-  // Memoized geometry/material
-  const geometry = useMemo(
-    () => new THREE.SphereGeometry(1, 32, 32),
+  // Nucleus geometry
+  const nucleusGeometry = useMemo(
+    () => new THREE.SphereGeometry(0.5, 32, 32),
     []
   );
 
-  const material = useMemo(
+  // Nucleus shader with pulsing glow
+  const nucleusMaterial = useMemo(
     () => new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
-        color: { value: new THREE.Color(color) }
+        color: { value: new THREE.Color(nucleusColor) }
       },
       vertexShader: `
         varying vec3 vNormal;
@@ -1288,167 +1362,236 @@ export function ExampleDiagram({
         varying vec3 vNormal;
 
         void main() {
-          float fresnel = pow(1.0 - dot(vNormal, vec3(0, 0, 1)), 3.0);
-          vec3 finalColor = color * (0.5 + fresnel * 0.5);
-          gl_FragColor = vec4(finalColor, 1.0);
+          float pulse = sin(time * 2.0) * 0.2 + 0.8;
+          float fresnel = pow(1.0 - dot(vNormal, vec3(0, 0, 1)), 2.0);
+          vec3 glow = color * (pulse + fresnel * 0.5);
+          gl_FragColor = vec4(glow, 1.0);
         }
       `
     }),
-    [color]
+    [nucleusColor]
   );
 
-  // Animation loop
-  useFrame((state, delta) => {
-    if (!meshRef.current) return;
+  // Autonomous animation loop
+  useFrame((state) => {
+    // Update nucleus pulse
+    nucleusMaterial.uniforms.time.value = state.clock.elapsedTime;
 
-    // Update physics
-    const dt = delta * timeScale;
-    physicsRef.current.acceleration.set(0, gravity, 0);
-    physicsRef.current.velocity.addScaledVector(
-      physicsRef.current.acceleration,
-      dt
-    );
-    meshRef.current.position.addScaledVector(
-      physicsRef.current.velocity,
-      dt
-    );
+    // Update electron positions (orbital motion)
+    electronsRef.current.forEach((electron, i) => {
+      if (!electron) return;
+      const shellRadius = 2 + Math.floor(i / 2) * 1.5;
+      const speed = 0.5 / (Math.floor(i / 2) + 1);
+      const offset = (i % 2) * Math.PI;
 
-    // Update shader uniforms
-    material.uniforms.time.value = state.clock.elapsedTime;
-
-    // Boundary conditions
-    if (meshRef.current.position.y < -5) {
-      meshRef.current.position.y = -5;
-      physicsRef.current.velocity.y *= -0.8; // Bounce with damping
-    }
+      electron.position.x = Math.cos(state.clock.elapsedTime * speed + offset) * shellRadius;
+      electron.position.z = Math.sin(state.clock.elapsedTime * speed + offset) * shellRadius;
+      electron.position.y = Math.sin(state.clock.elapsedTime * speed * 0.5) * 0.5;
+    });
   });
 
   return (
-    <mesh ref={meshRef} geometry={geometry} material={material} />
+    <group ref={groupRef}>
+      {/* Nucleus */}
+      <mesh geometry={nucleusGeometry} material={nucleusMaterial} />
+
+      {/* Electrons */}
+      {Array.from({ length: electrons }).map((_, i) => (
+        <mesh
+          key={i}
+          ref={(el) => (electronsRef.current[i] = el)}
+          position={[2 + i, 0, 0]}
+        >
+          <sphereGeometry args={[0.1, 16, 16]} />
+          <meshBasicMaterial color="#00D9FF" />
+        </mesh>
+      ))}
+    </group>
   );
 }
 ```
 
-### Custom Hook for Physics
+### Orbital Mechanics Hook
 
 ```javascript
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { usePhysicsStore } from '../stores/physicsStore';
+import * as THREE from 'three';
 
-export function usePhysicsObject(mass = 1.0) {
-  const physics = useRef({
-    position: new THREE.Vector3(),
-    velocity: new THREE.Vector3(),
-    acceleration: new THREE.Vector3(),
-    forces: new THREE.Vector3(),
-    mass: mass
+// Kepler's laws for planetary motion
+export function useOrbitalMechanics(semiMajorAxis, eccentricity = 0, period = 10) {
+  const position = useRef(new THREE.Vector3());
+  const angle = useRef(0);
+
+  useFrame((state, delta) => {
+    // Update orbital angle based on period
+    angle.current += (2 * Math.PI / period) * delta;
+
+    // Calculate position using Kepler's equation (simplified for circular/elliptical)
+    const r = semiMajorAxis * (1 - eccentricity * eccentricity) /
+              (1 + eccentricity * Math.cos(angle.current));
+
+    position.current.x = r * Math.cos(angle.current);
+    position.current.z = r * Math.sin(angle.current);
+    position.current.y = 0;  // Orbital plane
   });
 
-  const { gravity, timeScale, isPaused } = usePhysicsStore();
+  return position;
+}
 
-  const addForce = (force) => {
-    physics.current.forces.add(force);
-  };
+// Usage in planet component
+export function Planet({ orbit, period, radius, color }) {
+  const meshRef = useRef();
+  const position = useOrbitalMechanics(orbit, 0.02, period);
 
-  const clearForces = () => {
-    physics.current.forces.set(0, 0, 0);
-  };
-
-  const integrate = (delta) => {
-    if (isPaused) return;
-
-    const dt = delta * timeScale;
-    const { velocity, acceleration, forces, position } = physics.current;
-
-    // F = ma → a = F/m
-    acceleration.copy(forces).divideScalar(mass);
-    acceleration.y += gravity; // Add gravity
-
-    // Velocity Verlet integration
-    velocity.addScaledVector(acceleration, dt);
-    position.addScaledVector(velocity, dt);
-
-    clearForces();
-  };
-
-  useFrame((_, delta) => {
-    integrate(delta);
+  useFrame(() => {
+    if (meshRef.current) {
+      meshRef.current.position.copy(position.current);
+      meshRef.current.rotation.y += 0.01;  // Planet rotation
+    }
   });
 
-  return {
-    physics: physics.current,
-    addForce,
-    clearForces
-  };
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[radius, 32, 32]} />
+      <meshStandardMaterial color={color} />
+    </mesh>
+  );
 }
 ```
 
-### Field Visualization Component
+### DNA Helix Generator
 
 ```javascript
 import { useMemo } from 'react';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
 
-export function FieldLines({ sources = [], resolution = 20 }) {
-  const lines = useMemo(() => {
-    const lineGeometries = [];
+export function DNAHelix({ basePairs = 20, pitch = 3.4, radius = 1.0 }) {
+  const groupRef = useRef();
 
-    // Create field lines starting from grid around sources
-    sources.forEach(source => {
-      for (let i = 0; i < resolution; i++) {
-        const angle = (i / resolution) * Math.PI * 2;
-        const startPoint = new THREE.Vector3(
-          source.position.x + Math.cos(angle) * 0.5,
-          source.position.y,
-          source.position.z + Math.sin(angle) * 0.5
-        );
+  // Generate helix points
+  const { backbone1, backbone2, bases } = useMemo(() => {
+    const b1 = [], b2 = [], bases = [];
 
-        // Trace field line
-        const points = [];
-        let current = startPoint.clone();
+    for (let i = 0; i < basePairs; i++) {
+      const theta = (i / basePairs) * Math.PI * 4;  // 2 full turns
+      const y = (i / basePairs) * pitch * 2;
 
-        for (let step = 0; step < 100; step++) {
-          points.push(current.clone());
+      // First backbone strand
+      b1.push(new THREE.Vector3(
+        radius * Math.cos(theta),
+        y,
+        radius * Math.sin(theta)
+      ));
 
-          // Calculate field at current point
-          const field = new THREE.Vector3();
-          sources.forEach(s => {
-            const r = current.clone().sub(s.position);
-            const dist = r.length();
-            if (dist < 0.1) return; // Avoid singularity
+      // Second backbone strand (180° offset)
+      b2.push(new THREE.Vector3(
+        radius * Math.cos(theta + Math.PI),
+        y,
+        radius * Math.sin(theta + Math.PI)
+      ));
 
-            const magnitude = s.strength / (dist * dist);
-            field.add(r.normalize().multiplyScalar(magnitude));
-          });
+      // Base pair connection
+      bases.push({
+        start: b1[b1.length - 1].clone(),
+        end: b2[b2.length - 1].clone(),
+        type: ['AT', 'TA', 'GC', 'CG'][i % 4]
+      });
+    }
 
-          // Step along field
-          if (field.length() < 0.001) break;
-          current.add(field.normalize().multiplyScalar(0.1));
+    return {
+      backbone1: new THREE.CatmullRomCurve3(b1),
+      backbone2: new THREE.CatmullRomCurve3(b2),
+      bases
+    };
+  }, [basePairs, pitch, radius]);
 
-          // Bounds check
-          if (current.length() > 20) break;
-        }
-
-        if (points.length > 2) {
-          const geometry = new THREE.BufferGeometry().setFromPoints(points);
-          lineGeometries.push(geometry);
-        }
-      }
-    });
-
-    return lineGeometries;
-  }, [sources, resolution]);
+  // Slow rotation animation
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.1;
+    }
+  });
 
   return (
-    <group>
-      {lines.map((geometry, i) => (
-        <line key={i} geometry={geometry}>
-          <lineBasicMaterial color="#00D9FF" linewidth={2} />
-        </line>
+    <group ref={groupRef}>
+      {/* Backbone strands */}
+      <mesh>
+        <tubeGeometry args={[backbone1, 64, 0.05, 8, false]} />
+        <meshStandardMaterial color="#E8E8E8" emissive="#444444" />
+      </mesh>
+      <mesh>
+        <tubeGeometry args={[backbone2, 64, 0.05, 8, false]} />
+        <meshStandardMaterial color="#E8E8E8" emissive="#444444" />
+      </mesh>
+
+      {/* Base pairs */}
+      {bases.map((base, i) => (
+        <BasePair key={i} start={base.start} end={base.end} type={base.type} />
       ))}
     </group>
   );
+}
+
+function BasePair({ start, end, type }) {
+  const colors = {
+    AT: ['#FF6B6B', '#4ECDC4'],
+    TA: ['#4ECDC4', '#FF6B6B'],
+    GC: ['#45B7D1', '#96CEB4'],
+    CG: ['#96CEB4', '#45B7D1']
+  };
+
+  const midpoint = start.clone().add(end).multiplyScalar(0.5);
+  const [color1, color2] = colors[type];
+
+  return (
+    <group>
+      <mesh position={start.clone().add(midpoint).multiplyScalar(0.5).toArray()}>
+        <cylinderGeometry args={[0.03, 0.03, start.distanceTo(midpoint), 8]} />
+        <meshStandardMaterial color={color1} />
+      </mesh>
+      <mesh position={end.clone().add(midpoint).multiplyScalar(0.5).toArray()}>
+        <cylinderGeometry args={[0.03, 0.03, end.distanceTo(midpoint), 8]} />
+        <meshStandardMaterial color={color2} />
+      </mesh>
+    </group>
+  );
+}
+```
+
+### Auto-Orbit Camera Component
+
+```javascript
+import { useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import * as THREE from 'three';
+
+export function AutoOrbitCamera({
+  target = [0, 0, 0],
+  distance = 10,
+  speed = 0.1,
+  elevation = 0.3
+}) {
+  const { camera } = useThree();
+  const angleRef = useRef(0);
+  const targetVec = useRef(new THREE.Vector3(...target));
+
+  useFrame((state, delta) => {
+    // Slowly orbit around target
+    angleRef.current += speed * delta;
+
+    // Calculate camera position
+    const elevationOffset = Math.sin(angleRef.current * 0.3) * elevation;
+    camera.position.x = targetVec.current.x + Math.cos(angleRef.current) * distance;
+    camera.position.z = targetVec.current.z + Math.sin(angleRef.current) * distance;
+    camera.position.y = targetVec.current.y + distance * (elevation + elevationOffset);
+
+    // Always look at target
+    camera.lookAt(targetVec.current);
+  });
+
+  return null;  // This component only controls camera, renders nothing
 }
 ```
 
@@ -1525,28 +1668,39 @@ npm run preview
 
 This document serves as the master blueprint for **Aesthetica Physica**. It should be treated as a living document—updated as the project evolves, new patterns emerge, and better practices are discovered.
 
-### Philosophy Reminder
+### Design Philosophy
 
-Every diagram we create should:
-1. **Teach** - Users should understand the physics better
-2. **Inspire** - Beauty should draw people to science
-3. **Perform** - 60fps is non-negotiable
-4. **Accuracy** - Never sacrifice physics correctness for aesthetics
+Every visualization we create should:
+1. **Mesmerize** - Viewers should be drawn into continuous observation
+2. **Inspire Wonder** - Beauty should spark curiosity about nature
+3. **Perform Flawlessly** - 60fps is non-negotiable for smooth, hypnotic motion
+4. **Respect Physics** - All motion emerges from accurate physical simulation
+
+### The View-Only Experience
+
+Remember: **No user input whatsoever.** The website is a window into beautiful, autonomous physics simulations. Visitors watch, contemplate, and appreciate—like observing an aquarium or gazing at stars. The absence of controls is a feature, not a limitation. It creates:
+
+- **Immediacy**: No learning curve, instant immersion
+- **Calm**: No decisions to make, pure observation
+- **Universality**: Works the same for everyone
+- **Ambient Quality**: Can run indefinitely as digital art
 
 ### Next Steps
 
 1. Initialize project with Vite + React + Three.js
-2. Set up base scene architecture
-3. Implement first diagram (simple pendulum) as template
-4. Iterate and expand catalog
+2. Set up base scene with autonomous camera
+3. Implement The Atom visualization first
+4. Add The Solar System and DNA Helix
+5. Polish with post-processing and ambient effects
+6. Deploy as a simple, beautiful web gallery
 
 ---
 
-**Document Version**: 1.0
+**Document Version**: 1.1
 **Last Updated**: 2025-11-21
 **Author**: Senior Creative Technologist & Physics Engine Architect
 **Project**: Aesthetica Physica
 
 ---
 
-*"Where physics meets poetry, and code becomes art."*
+*"Where physics meets poetry, and code becomes contemplation."*
