@@ -10,6 +10,9 @@ interface AppState {
   // Current visualization
   currentVisualization: VisualizationType
 
+  // Grid visibility
+  showGrid: boolean
+
   // Physics state
   elapsedTime: number
   isPaused: boolean
@@ -17,6 +20,7 @@ interface AppState {
   // Actions
   toggleMode: () => void
   setVisualization: (viz: VisualizationType) => void
+  toggleGrid: () => void
   tick: (delta: number) => void
 
   // Computed
@@ -26,6 +30,7 @@ interface AppState {
 export const useAppStore = create<AppState>((set, get) => ({
   mode: 'animated',
   currentVisualization: 'atom',
+  showGrid: false,
   elapsedTime: 0,
   isPaused: false,
 
@@ -38,6 +43,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     currentVisualization: viz,
     elapsedTime: 0 // Reset time when switching
   }),
+
+  toggleGrid: () => set((state) => ({
+    showGrid: !state.showGrid
+  })),
 
   tick: (delta) => {
     const { isPaused } = get()

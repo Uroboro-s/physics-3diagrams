@@ -4,6 +4,7 @@ import { useAppStore } from './stores/appStore'
 import { Scene } from './components/Scene'
 import { ModeToggle } from './components/ui/ModeToggle'
 import { VisualizationSelector } from './components/ui/VisualizationSelector'
+import { GridToggle } from './components/ui/GridToggle'
 
 export default function App() {
   const mode = useAppStore((state) => state.mode)
@@ -26,6 +27,7 @@ export default function App() {
 
       {/* UI Overlay */}
       <ModeToggle />
+      <GridToggle />
       <VisualizationSelector />
 
       {/* Mode indicator */}

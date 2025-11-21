@@ -2,6 +2,7 @@ import { useFrame } from '@react-three/fiber'
 import { useAppStore } from '../stores/appStore'
 import { DualModeCamera } from './core/DualModeCamera'
 import { Lighting } from './core/Lighting'
+import { Grid } from './core/Grid'
 import { AtomVisualization } from '../visualizations/Atom'
 import { SolarSystemVisualization } from '../visualizations/SolarSystem'
 import { DNAHelixVisualization } from '../visualizations/DNAHelix'
@@ -36,6 +37,7 @@ export function Scene() {
     <>
       <DualModeCamera />
       <Lighting />
+      <Grid />
       {renderVisualization()}
     </>
   )
