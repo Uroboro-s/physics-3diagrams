@@ -46,11 +46,19 @@ html, body, #root {
   transform: translateY(0);
 }
 
-/* Grid Toggle Button */
-.grid-toggle {
+/* Grid Controls Container */
+.grid-controls {
   position: fixed;
   bottom: 80px;
   right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+}
+
+/* Grid Toggle Button */
+.grid-toggle {
   padding: 10px 18px;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(10px);
@@ -61,7 +69,6 @@ html, body, #root {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 1000;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -91,6 +98,66 @@ html, body, #root {
 
 .grid-toggle-text {
   font-size: 13px;
+}
+
+/* Grid Color Toggle Button */
+.grid-color-toggle {
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.grid-color-toggle:hover {
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.grid-color-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.color-dots {
+  display: flex;
+  gap: 3px;
+}
+
+.color-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.color-dots .dot.cyan {
+  background: #4a90d9;
+}
+
+.color-dots .dot.violet {
+  background: #9d4edd;
+}
+
+.color-dots .dot.pink {
+  background: #ff6b9d;
+}
+
+.color-dots .dot.gray {
+  background: #888888;
+}
+
+.grid-color-text {
+  font-size: 12px;
 }
 
 /* Visualization Selector */

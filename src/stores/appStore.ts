@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 export type ViewMode = 'animated' | 'interactive'
 export type VisualizationType = 'atom' | 'solar-system' | 'dna-helix'
+export type GridColorMode = 'colorful' | 'monochrome'
 
 interface AppState {
   // View mode
@@ -10,8 +11,9 @@ interface AppState {
   // Current visualization
   currentVisualization: VisualizationType
 
-  // Grid visibility
+  // Grid visibility and color
   showGrid: boolean
+  gridColorMode: GridColorMode
 
   // Physics state
   elapsedTime: number
@@ -21,6 +23,7 @@ interface AppState {
   toggleMode: () => void
   setVisualization: (viz: VisualizationType) => void
   toggleGrid: () => void
+  cycleGridColor: () => void
   tick: (delta: number) => void
 
   // Computed
@@ -31,6 +34,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   mode: 'animated',
   currentVisualization: 'atom',
   showGrid: false,
+  gridColorMode: 'colorful',
   elapsedTime: 0,
   isPaused: false,
 
@@ -46,6 +50,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   toggleGrid: () => set((state) => ({
     showGrid: !state.showGrid
+  })),
+
+  cycleGridColor: () => set((state) => ({
+    gridColorMode: state.gridColorMode === 'colorful' ? 'monochrome' : 'colorful'
   })),
 
   tick: (delta) => {
